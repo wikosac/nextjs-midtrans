@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { updateOrderStatus } from "../../lib/firestore";
 
 const serverKey =
     process.env.MIDTRANS_SERVER_KEY || process.env.SECRET || process.env.MIDTRANS_SERVER;
@@ -30,8 +31,21 @@ export async function POST(request) {
             }
         }
 
-        // TODO: handle notification (update order status in DB, etc.)
+        // Handle notification - update order status in Firestore
         console.log("Midtrans notification received:", body);
+
+        if (order_id && status_code) {
+            try {
+                await updateOrderStatus(order_id, status_code, body);
+                console.log(`Successfully updated order ${order_id} with status ${status_code}`);
+            } catch (firestoreError) {
+                console.error("Error updating order status in Firestore:", firestoreError);
+                // Don't fail the notification - Midtrans expects 200 response
+                // Log the error for manual intervention if needed
+            }
+        } else {
+            console.warn("Missing order_id or status_code in notification", { body });
+        }
 
         return NextResponse.json({ status: "ok" }, { status: 200 });
     } catch (error) {
