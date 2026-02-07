@@ -1,11 +1,9 @@
 import Midtrans from "midtrans-client";
 import { NextResponse } from "next/server";
 
-const serverKey =
-    process.env.MIDTRANS_SERVER_KEY || process.env.SECRET || process.env.MIDTRANS_SERVER;
-const clientKey =
-    process.env.MIDTRANS_CLIENT_KEY || process.env.NEXT_PUBLIC_CLIENT || process.env.MIDTRANS_CLIENT;
-const isProduction = process.env.NODE_ENV === "production";
+const serverKey = process.env.SECRET;
+const clientKey = process.env.NEXT_PUBLIC_CLIENT;
+const isProduction = false;
 
 const snap = new Midtrans.Snap({ isProduction, serverKey, clientKey });
 
